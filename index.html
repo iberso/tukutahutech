@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>tukutahu.tech</title>
+  <meta name="description" content="Tuku tahu tek, Rek." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Bricolage+Grotesque:wght@500;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            latar: 'var(--latar)',
+            tinta: 'var(--tinta)',
+            sambal: 'var(--sambal)',
+            redup: 'var(--redup)',
+          },
+          fontFamily: {
+            papan: ['"Bowlby One"', '"Arial Black"', 'Impact', 'sans-serif'],
+            teks: ['"Bricolage Grotesque"', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Palet: hijau daun pisang, krem tahu, oranye tahu goreng */
+    :root {
+      --latar: #E4EFCB;
+      --tinta: #1F5E3B;
+      --sambal: #F08A24;
+      --redup: #4F7A55;
+      color-scheme: light;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --latar: #10301F;
+        --tinta: #FFF1D0;
+        --sambal: #E8892B;
+        --redup: #A9C9A0;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --latar: #10301F;
+      --tinta: #FFF1D0;
+      --sambal: #E8892B;
+      --redup: #A9C9A0;
+      color-scheme: dark;
+    }
+
+    html, body { height: 100%; }
+    body { background: var(--latar); }
+
+    /* Judul ala papan nama warung: huruf tebal, bayangan merah berlapis */
+    .judul {
+      line-height: 0.86;
+      letter-spacing: -0.02em;
+      text-shadow:
+        0.02em 0.02em 0 var(--sambal),
+        0.04em 0.04em 0 var(--sambal),
+        0.06em 0.06em 0 var(--sambal),
+        0.08em 0.08em 0 var(--sambal);
+    }
+
+    .jatuh {
+      position: fixed;
+      top: 0;
+      pointer-events: none;
+      will-change: transform;
+      z-index: 0;
+    }
+    .jatuh svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 6px 6px rgba(16, 48, 31, 0.25)); }
+
+    @keyframes turun {
+      from { transform: translate3d(0, -25vh, 0) rotate(0deg); }
+      to   { transform: translate3d(var(--geser), 125vh, 0) rotate(var(--putar)); }
+    }
+    @keyframes lompat {
+      0%   { transform: translate3d(0, 0, 0) scale(0.2) rotate(0deg); }
+      16%  { transform: translate3d(calc(var(--geser) * 0.25), -16vh, 0) scale(1) rotate(calc(var(--putar) * 0.15)); animation-timing-function: cubic-bezier(.5, 0, 1, 1); }
+      100% { transform: translate3d(var(--geser), 125vh, 0) scale(1) rotate(var(--putar)); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .jatuh { animation: none !important; }
+    }
+  </style>
+</head>
+<body class="font-teks text-tinta overflow-hidden select-none">
+
+  <div id="hujan" aria-hidden="true"></div>
+
+  <main class="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center pointer-events-none">
+    <h1 class="judul font-papan text-tinta whitespace-nowrap" style="font-size: clamp(2.2rem, 10vw, 11rem);">tukutahu.tech</h1>
+    <p class="mt-10 font-teks font-bold text-tinta" style="font-size: clamp(1.15rem, 2.4vw, 1.75rem);">
+      Tuku tahu tek, Rek.
+    </p>
+    <p id="petunjuk" class="mt-2 font-teks font-medium text-redup text-sm sm:text-base">
+      Klik di mana aja buat nambah tahu.
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      const wadah = document.getElementById('hujan');
+      const kurangGerak = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const MAKS = 55;
+
+      if (window.matchMedia('(pointer: coarse)').matches) {
+        document.getElementById('petunjuk').textContent = 'Ketuk di mana aja buat nambah tahu.';
+      }
+
+      // ---- Gambar-gambar (SVG) ----
+      const garis = 'stroke="#4A2A12" stroke-width="3" stroke-linejoin="round"';
+
+      const tahuGoreng = `
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,10 90,30 50,50 10,30" fill="#E9B35C" ${garis}/>
+          <polygon points="10,30 50,50 50,92 10,72" fill="#C77F2A" ${garis}/>
+          <polygon points="90,30 50,50 50,92 90,72" fill="#A9631E" ${garis}/>
+          <ellipse cx="44" cy="27" rx="4" ry="2" fill="#C98A36"/>
+          <ellipse cx="60" cy="33" rx="3" ry="1.6" fill="#C98A36"/>
+          <ellipse cx="26" cy="56" rx="3" ry="4" fill="#A86A22"/>
+          <ellipse cx="36" cy="72" rx="2.5" ry="3.5" fill="#A86A22"/>
+          <ellipse cx="70" cy="60" rx="3" ry="4" fill="#8C501A"/>
+        </svg>`;
+
+      // Tahu yang sudah dipotong "tek": kelihatan dalamnya yang putih
+      const tahuPotong = `
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,14 88,32 50,50 12,32" fill="#FFF3D6" ${garis}/>
+          <polygon points="12,32 50,50 50,86 12,68" fill="#D18A33" ${garis}/>
+          <polygon points="88,32 50,50 50,86 88,68" fill="#B06A20" ${garis}/>
+          <circle cx="40" cy="30" r="2.2" fill="#F1DDAE"/>
+          <circle cx="55" cy="26" r="1.8" fill="#F1DDAE"/>
+          <circle cx="58" cy="38" r="2.4" fill="#F1DDAE"/>
+          <circle cx="46" cy="40" r="1.5" fill="#F1DDAE"/>
+        </svg>`;
+
+      const petis = `
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 10 C61 10 66 22 63 32 C78 34 89 47 87 62 C85 80 67 90 50 90 C33 90 15 80 13 62 C11 47 22 34 37 32 C34 22 39 10 50 10 Z"
+                fill="#2B1A12" stroke="#6B4A37" stroke-width="3"/>
+          <path d="M66 82 C68 88 68 95 63 96 C59 96 59 90 61 85 Z" fill="#2B1A12" stroke="#6B4A37" stroke-width="2"/>
+          <ellipse cx="36" cy="48" rx="9" ry="5" transform="rotate(-25 36 48)" fill="#FFFFFF" opacity="0.38"/>
+          <ellipse cx="49" cy="22" rx="4" ry="2.5" transform="rotate(-20 49 22)" fill="#FFFFFF" opacity="0.3"/>
+        </svg>`;
+
+      const telurCeplok = `
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 8 C70 6 92 22 90 44 C96 64 80 92 56 90 C36 96 10 84 10 60 C4 38 26 10 50 8 Z"
+                fill="#FFFDF5" stroke="#D9C9A6" stroke-width="3"/>
+          <circle cx="48" cy="50" r="18" fill="#FFB300" stroke="#E08A00" stroke-width="3"/>
+          <ellipse cx="42" cy="44" rx="5" ry="3" transform="rotate(-30 42 44)" fill="#FFFFFF" opacity="0.6"/>
+        </svg>`;
+
+      const telurUtuh = `
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 8 C70 8 84 40 84 60 C84 80 69 93 50 93 C31 93 16 80 16 60 C16 40 30 8 50 8 Z"
+                fill="#F3E2C3" stroke="#C9AE80" stroke-width="3"/>
+          <ellipse cx="38" cy="38" rx="7" ry="12" transform="rotate(20 38 38)" fill="#FFFFFF" opacity="0.55"/>
+        </svg>`;
+
+      // Tahu paling sering jatuh, karena ini kan tukutahu
+      const daftar = [tahuGoreng, tahuGoreng, tahuPotong, tahuPotong, petis, petis, telurCeplok, telurUtuh];
+
+      const acak = (min, max) => Math.random() * (max - min) + min;
+      const pilih = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+      function buatBenda(ukuran) {
+        const el = document.createElement('div');
+        el.className = 'jatuh';
+        el.style.width = el.style.height = ukuran + 'px';
+        el.innerHTML = pilih(daftar);
+        el.style.setProperty('--geser', acak(-12, 12) + 'vw');
+        el.style.setProperty('--putar', acak(-540, 540) + 'deg');
+        el.addEventListener('animationend', () => el.remove());
+        return el;
+      }
+
+      function jatuhkan() {
+        if (wadah.childElementCount >= MAKS) return;
+        const ukuran = acak(42, 120);
+        const el = buatBenda(ukuran);
+        el.style.left = acak(-4, 100) + 'vw';
+        el.style.marginLeft = -(ukuran / 2) + 'px';
+        el.style.opacity = acak(0.85, 1);
+        el.style.animation = `turun ${acak(5, 11).toFixed(2)}s cubic-bezier(.35,.05,.65,1) forwards`;
+        wadah.appendChild(el);
+      }
+
+      function sebarDiam(jumlah) {
+        for (let i = 0; i < jumlah; i++) {
+          const ukuran = acak(42, 110);
+          const el = buatBenda(ukuran);
+          el.style.left = acak(0, 100) + 'vw';
+          el.style.top = acak(0, 100) + 'vh';
+          el.style.margin = `${-ukuran / 2}px 0 0 ${-ukuran / 2}px`;
+          el.style.transform = `rotate(${acak(-40, 40)}deg)`;
+          wadah.appendChild(el);
+        }
+      }
+
+      function ledakan(x, y) {
+        const jumlah = 9;
+        for (let i = 0; i < jumlah; i++) {
+          const ukuran = acak(40, 95);
+          const el = buatBenda(ukuran);
+          el.style.left = (x - ukuran / 2) + 'px';
+          el.style.top = (y - ukuran / 2) + 'px';
+          el.style.setProperty('--geser', acak(-30, 30) + 'vw');
+          el.style.animation = `lompat ${acak(2.6, 4.2).toFixed(2)}s linear forwards`;
+          el.style.animationDelay = (i * 25) + 'ms';
+          wadah.appendChild(el);
+        }
+      }
+
+      if (kurangGerak) {
+        sebarDiam(18);
+        window.addEventListener('pointerdown', (e) => {
+          const ukuran = acak(50, 100);
+          const el = buatBenda(ukuran);
+          el.style.left = (e.clientX - ukuran / 2) + 'px';
+          el.style.top = (e.clientY - ukuran / 2) + 'px';
+          wadah.appendChild(el);
+        });
+        return;
+      }
+
+      // Hujan pembuka biar langsung rame
+      for (let i = 0; i < 14; i++) setTimeout(jatuhkan, i * 90);
+      let timer = setInterval(jatuhkan, 300);
+
+      document.addEventListener('visibilitychange', () => {
+        clearInterval(timer);
+        if (!document.hidden) timer = setInterval(jatuhkan, 300);
+      });
+
+      window.addEventListener('pointerdown', (e) => ledakan(e.clientX, e.clientY));
+    })();
+  </script>
+</body>
+</html>
